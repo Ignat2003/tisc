@@ -57,6 +57,7 @@ class Classifier:
         self.validation_loss_list = []
         self.training_accuracy_list = []
         self.validation_accuracy_list = []
+        self.validation_f1_list = []
 
     def train(self,
               epochs: int,
