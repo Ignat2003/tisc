@@ -151,7 +151,7 @@ class Classifier:
 
             self.training_loss_list.append(epoch_training_loss)
             self.training_accuracy_list.append(epoch_training_accuracy)
-            epoch_training_f1 = f1_score(training_labels, training_predictions, average='weighted')  # Calculate F1 score
+            epoch_training_f1 = f1_score(training_labels, training_predictions, average='macro')  # Calculate F1 score
     
 
             if val_loader is not None:
@@ -176,7 +176,7 @@ class Classifier:
                     
                     epoch_val_loss = val_loss / len(val_loader)
                     epoch_val_accuracy = val_correct / val_total_samples
-                    epoch_val_f1 = f1_score(val_labels, val_predictions, average='weighted')  # Calculate F1 score
+                    epoch_val_f1 = f1_score(val_labels, val_predictions, average='macro')  # Calculate F1 score
 
                     self.validation_loss_list.append(epoch_val_loss)
                     self.validation_accuracy_list.append(epoch_val_accuracy)
