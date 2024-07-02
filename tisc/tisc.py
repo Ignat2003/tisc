@@ -14,7 +14,7 @@ from datetime import datetime
 from importlib import import_module
 from torch.utils.data import DataLoader
 
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix, f1_score
 
 from .modules.utils import filter_kwargs_for_module
 
@@ -123,6 +123,8 @@ class Classifier:
             training_loss = 0.0
             correct = 0.0
             total_samples = 0.0
+            training_predictions = []
+            training_labels = []
             for inputs, labels in train_loader:
                 inputs, labels = inputs.to(self.device), labels.to(self.device)
 
@@ -139,12 +141,17 @@ class Classifier:
                 _, predicted = torch.max(outputs, 1)
                 correct += (predicted == labels).sum().item()
                 total_samples += labels.size(0)
+                
+                training_predictions.extend(predicted.cpu().tolist())
+                training_labels.extend(labels.cpu().tolist())
             
             epoch_training_loss = training_loss / len(train_loader)
             epoch_training_accuracy = correct / total_samples
 
             self.training_loss_list.append(epoch_training_loss)
             self.training_accuracy_list.append(epoch_training_accuracy)
+            epoch_training_f1 = f1_score(training_labels, training_predictions, average='macro')  # Calculate F1 score
+    
 
             if val_loader is not None:
                 self.model.eval()
@@ -152,6 +159,8 @@ class Classifier:
                     val_loss = 0.0
                     val_correct = 0.0
                     val_total_samples = 0.0
+                    val_predictions = []
+                    val_labels = []
                     for inputs, labels in val_loader:
                         inputs, labels = inputs.to(self.device), labels.to(self.device)
                         outputs = self.model(inputs)
@@ -160,15 +169,20 @@ class Classifier:
                         _, predicted = torch.max(outputs, 1)
                         val_correct += (predicted == labels).sum().item()
                         val_total_samples += labels.size(0)
+                        
+                        val_predictions.extend(predicted.cpu().tolist())
+                        val_labels.extend(labels.cpu().tolist())
                     
                     epoch_val_loss = val_loss / len(val_loader)
                     epoch_val_accuracy = val_correct / val_total_samples
+                    epoch_val_f1 = f1_score(val_labels, val_predictions, average='macro')  # Calculate F1 score
 
                     self.validation_loss_list.append(epoch_val_loss)
                     self.validation_accuracy_list.append(epoch_val_accuracy)
+                    self.validation_f1_list.append(epoch_val_f1) 
                 
-                    print(f"[Epoch {epoch + 1}/{epochs}] training_loss: {epoch_training_loss:.12f} training_accuracy: {epoch_training_accuracy:.12f} val_loss: {epoch_val_loss:.12f} val_accuracy: {epoch_val_accuracy:.12f}")
-
+                    print(f"[Epoch {epoch + 1}/{epochs}] training_loss: {epoch_training_loss:.12f} 
+                          training_accuracy: {epoch_training_accuracy:.12f} training_f1: {epoch_training_f1:.12f} val_loss: {epoch_val_loss:.12f} val_accuracy: {epoch_val_accuracy:.12f} val_f1: {epoch_val_f1:.12f}")
                 if save_model:
                     if save_strategy == "train_loss":
                         if epoch_training_loss < best_training_loss:
