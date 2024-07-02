@@ -181,8 +181,7 @@ class Classifier:
                     self.validation_accuracy_list.append(epoch_val_accuracy)
                     self.validation_f1_list.append(epoch_val_f1) 
                 
-                    print(f"[Epoch {epoch + 1}/{epochs}] training_loss: {epoch_training_loss:.12f} 
-                          training_accuracy: {epoch_training_accuracy:.12f} training_f1: {epoch_training_f1:.12f} val_loss: {epoch_val_loss:.12f} val_accuracy: {epoch_val_accuracy:.12f} val_f1: {epoch_val_f1:.12f}")
+                    print(f"[Epoch {epoch + 1}/{epochs}] training_loss: {epoch_training_loss:.12f} training_accuracy: {epoch_training_accuracy:.12f} training_f1: {epoch_training_f1:.12f} val_loss: {epoch_val_loss:.12f} val_accuracy: {epoch_val_accuracy:.12f} val_f1: {epoch_val_f1:.12f}")
                 if save_model:
                     if save_strategy == "train_loss":
                         if epoch_training_loss < best_training_loss:
