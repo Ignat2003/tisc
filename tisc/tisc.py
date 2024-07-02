@@ -29,7 +29,8 @@ class Classifier:
                  optimizer=optim.Adam,
                  scheduler=None,
                  output_base="tisc_output",
-                 classes=None):
+                 classes=None,
+                 class_weights=None):
         
         self.num_classes = num_classes
         if classes is None:
@@ -38,7 +39,10 @@ class Classifier:
             self.classes = classes
         
         if num_classes == 2:
-            self.criterion = nn.BCEWithLogitsLoss()
+            if class_weights:
+                self.criterion = nn.BCEWithLogitsLoss()
+            else:
+                self.criterion = nn.BCEWithLogitsLoss(pos_weight=class_weights)
 
         self.model_name = model_name
         self.device = device
